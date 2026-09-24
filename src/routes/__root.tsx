@@ -130,8 +130,38 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-      <Outlet />
+      <div className="page-glow min-h-screen">
+        <header className="sticky top-0 z-20 border-b border-border/80 bg-background/85 backdrop-blur">
+          <div className="mx-auto flex max-w-7xl flex-wrap items-center gap-x-6 gap-y-2 px-4 py-3 sm:px-6">
+            <Link to="/" className="flex items-center gap-2">
+              <span className="h-2.5 w-2.5 rounded-full bg-primary" />
+              <span className="font-display text-base font-semibold tracking-tight">
+                Job Market Pulse
+              </span>
+            </Link>
+            <nav className="flex items-center gap-1 text-sm">
+              <Link
+                to="/"
+                className="rounded-md px-3 py-1.5 text-muted-foreground transition-colors hover:text-foreground"
+                activeProps={{ className: "bg-secondary text-foreground" }}
+                activeOptions={{ exact: true }}
+              >
+                Search
+              </Link>
+              <Link
+                to="/history"
+                className="rounded-md px-3 py-1.5 text-muted-foreground transition-colors hover:text-foreground"
+                activeProps={{ className: "bg-secondary text-foreground" }}
+              >
+                History
+              </Link>
+            </nav>
+          </div>
+        </header>
+        {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
+        <Outlet />
+      </div>
+      <Toaster />
     </QueryClientProvider>
   );
 }
