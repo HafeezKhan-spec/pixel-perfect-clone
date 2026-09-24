@@ -9,6 +9,8 @@ import {
 } from "@tanstack/react-router";
 import { useEffect, type ReactNode } from "react";
 
+import { Toaster } from "../components/ui/sonner";
+
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 
@@ -77,11 +79,16 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Lovable App" },
-      { name: "description", content: "Lovable Generated Project" },
-      { name: "author", content: "Lovable" },
-      { property: "og:title", content: "Lovable App" },
-      { property: "og:description", content: "Lovable Generated Project" },
+      { title: "Job Market Pulse" },
+      {
+        name: "description",
+        content: "Track hiring demand across job boards for several roles at once.",
+      },
+      { property: "og:title", content: "Job Market Pulse" },
+      {
+        property: "og:description",
+        content: "Track hiring demand across job boards for several roles at once.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:site", content: "@Lovable" },
@@ -90,6 +97,12 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       {
         rel: "stylesheet",
         href: appCss,
+      },
+      { rel: "preconnect", href: "https://fonts.googleapis.com" },
+      { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
+      {
+        rel: "stylesheet",
+        href: "https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=DM+Sans:wght@400;500;600&display=swap",
       },
       { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
     ],
@@ -119,8 +132,38 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-      <Outlet />
+      <div className="page-glow min-h-screen">
+        <header className="sticky top-0 z-20 border-b border-border/80 bg-background/85 backdrop-blur">
+          <div className="mx-auto flex max-w-7xl flex-wrap items-center gap-x-6 gap-y-2 px-4 py-3 sm:px-6">
+            <Link to="/" className="flex items-center gap-2">
+              <span className="h-2.5 w-2.5 rounded-full bg-primary" />
+              <span className="font-display text-base font-semibold tracking-tight">
+                Job Market Pulse
+              </span>
+            </Link>
+            <nav className="flex items-center gap-1 text-sm">
+              <Link
+                to="/"
+                className="rounded-md px-3 py-1.5 text-muted-foreground transition-colors hover:text-foreground"
+                activeProps={{ className: "bg-secondary text-foreground" }}
+                activeOptions={{ exact: true }}
+              >
+                Search
+              </Link>
+              <Link
+                to="/history"
+                className="rounded-md px-3 py-1.5 text-muted-foreground transition-colors hover:text-foreground"
+                activeProps={{ className: "bg-secondary text-foreground" }}
+              >
+                History
+              </Link>
+            </nav>
+          </div>
+        </header>
+        {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
+        <Outlet />
+      </div>
+      <Toaster />
     </QueryClientProvider>
   );
 }

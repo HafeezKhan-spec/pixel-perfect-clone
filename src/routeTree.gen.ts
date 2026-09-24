@@ -10,33 +10,114 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as HistoryRouteImport } from './routes/history'
+import { Route as ApiExportRouteImport } from './routes/api/export'
+import { Route as ApiHistoryRouteImport } from './routes/api/history'
+import { Route as ApiSearchRouteImport } from './routes/api/search'
+import { Route as SearchSearchIdRouteImport } from './routes/search.$searchId'
+import { Route as ApiSearchSearchIdRouteImport } from './routes/api/search.$searchId'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const HistoryRoute = HistoryRouteImport.update({
+  id: '/history',
+  path: '/history',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiExportRoute = ApiExportRouteImport.update({
+  id: '/api/export',
+  path: '/api/export',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiHistoryRoute = ApiHistoryRouteImport.update({
+  id: '/api/history',
+  path: '/api/history',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiSearchRoute = ApiSearchRouteImport.update({
+  id: '/api/search',
+  path: '/api/search',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SearchSearchIdRoute = SearchSearchIdRouteImport.update({
+  id: '/search/$searchId',
+  path: '/search/$searchId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiSearchSearchIdRoute = ApiSearchSearchIdRouteImport.update({
+  id: '/$searchId',
+  path: '/$searchId',
+  getParentRoute: () => ApiSearchRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/history': typeof HistoryRoute
+  '/api/export': typeof ApiExportRoute
+  '/api/history': typeof ApiHistoryRoute
+  '/api/search': typeof ApiSearchRouteWithChildren
+  '/search/$searchId': typeof SearchSearchIdRoute
+  '/api/search/$searchId': typeof ApiSearchSearchIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/history': typeof HistoryRoute
+  '/api/export': typeof ApiExportRoute
+  '/api/history': typeof ApiHistoryRoute
+  '/api/search': typeof ApiSearchRouteWithChildren
+  '/search/$searchId': typeof SearchSearchIdRoute
+  '/api/search/$searchId': typeof ApiSearchSearchIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/history': typeof HistoryRoute
+  '/api/export': typeof ApiExportRoute
+  '/api/history': typeof ApiHistoryRoute
+  '/api/search': typeof ApiSearchRouteWithChildren
+  '/search/$searchId': typeof SearchSearchIdRoute
+  '/api/search/$searchId': typeof ApiSearchSearchIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/history'
+    | '/api/export'
+    | '/api/history'
+    | '/api/search'
+    | '/search/$searchId'
+    | '/api/search/$searchId'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/history'
+    | '/api/export'
+    | '/api/history'
+    | '/api/search'
+    | '/search/$searchId'
+    | '/api/search/$searchId'
+  id:
+    | '__root__'
+    | '/'
+    | '/history'
+    | '/api/export'
+    | '/api/history'
+    | '/api/search'
+    | '/search/$searchId'
+    | '/api/search/$searchId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  HistoryRoute: typeof HistoryRoute
+  ApiExportRoute: typeof ApiExportRoute
+  ApiHistoryRoute: typeof ApiHistoryRoute
+  ApiSearchRoute: typeof ApiSearchRouteWithChildren
+  SearchSearchIdRoute: typeof SearchSearchIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +129,70 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/history': {
+      id: '/history'
+      path: '/history'
+      fullPath: '/history'
+      preLoaderRoute: typeof HistoryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/export': {
+      id: '/api/export'
+      path: '/api/export'
+      fullPath: '/api/export'
+      preLoaderRoute: typeof ApiExportRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/history': {
+      id: '/api/history'
+      path: '/api/history'
+      fullPath: '/api/history'
+      preLoaderRoute: typeof ApiHistoryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/search': {
+      id: '/api/search'
+      path: '/api/search'
+      fullPath: '/api/search'
+      preLoaderRoute: typeof ApiSearchRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/search/$searchId': {
+      id: '/search/$searchId'
+      path: '/search/$searchId'
+      fullPath: '/search/$searchId'
+      preLoaderRoute: typeof SearchSearchIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/search/$searchId': {
+      id: '/api/search/$searchId'
+      path: '/$searchId'
+      fullPath: '/api/search/$searchId'
+      preLoaderRoute: typeof ApiSearchSearchIdRouteImport
+      parentRoute: typeof ApiSearchRoute
+    }
   }
 }
 
+interface ApiSearchRouteChildren {
+  ApiSearchSearchIdRoute: typeof ApiSearchSearchIdRoute
+}
+
+const ApiSearchRouteChildren: ApiSearchRouteChildren = {
+  ApiSearchSearchIdRoute: ApiSearchSearchIdRoute,
+}
+
+const ApiSearchRouteWithChildren = ApiSearchRoute._addFileChildren(
+  ApiSearchRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  HistoryRoute: HistoryRoute,
+  ApiExportRoute: ApiExportRoute,
+  ApiHistoryRoute: ApiHistoryRoute,
+  ApiSearchRoute: ApiSearchRouteWithChildren,
+  SearchSearchIdRoute: SearchSearchIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
