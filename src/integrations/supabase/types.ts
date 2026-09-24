@@ -14,7 +14,92 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      search_jobs: {
+        Row: {
+          apply_url: string
+          company: string
+          created_at: string
+          days_ago: number
+          employment_type: string
+          id: string
+          is_new: boolean
+          job_id: string
+          job_title: string
+          location: string
+          matched_keywords: string[]
+          platform: string
+          posted_date: string
+          search_id: string
+        }
+        Insert: {
+          apply_url: string
+          company: string
+          created_at?: string
+          days_ago?: number
+          employment_type: string
+          id?: string
+          is_new?: boolean
+          job_id: string
+          job_title: string
+          location?: string
+          matched_keywords?: string[]
+          platform: string
+          posted_date: string
+          search_id: string
+        }
+        Update: {
+          apply_url?: string
+          company?: string
+          created_at?: string
+          days_ago?: number
+          employment_type?: string
+          id?: string
+          is_new?: boolean
+          job_id?: string
+          job_title?: string
+          location?: string
+          matched_keywords?: string[]
+          platform?: string
+          posted_date?: string
+          search_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "search_jobs_search_id_fkey"
+            columns: ["search_id"]
+            isOneToOne: false
+            referencedRelation: "searches"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      searches: {
+        Row: {
+          created_at: string
+          id: string
+          keywords: string[]
+          location: string
+          new_results_count: number
+          total_results: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          keywords: string[]
+          location?: string
+          new_results_count?: number
+          total_results?: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          keywords?: string[]
+          location?: string
+          new_results_count?: number
+          total_results?: number
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
