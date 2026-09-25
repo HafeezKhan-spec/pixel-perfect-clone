@@ -119,7 +119,7 @@ function JobPage() {
   });
 
   const goBack = () => {
-    if (window.history.length > 1) router.history.back();
+    if (router.history.canGoBack()) router.history.back();
     else router.navigate({ to: "/history" });
   };
 
