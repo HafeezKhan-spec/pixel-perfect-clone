@@ -112,7 +112,16 @@ export async function getSearch(searchId: string): Promise<SearchResponse | null
     .order("days_ago", { ascending: true });
   if (error) throw new Error(error.message);
 
-  return await toResponse(search, (rows ?? []) as JobRow[]);
+  // Older runs predate enrichment; fill in any missing detail rows.
+  const list = (rows ?? []) as JobRow[];
+  const perCompany: Record<string, number> = {};
+  for (const job of list) perCompany[job.company] = (perCompany[job.company] ?? 0) + 1;
+  await supabaseAdmin.from("job_details").upsert(
+    list.map((job) => enrichJob(job, perCompany[job.company] ?? 1)),
+    { onConflict: "job_id", ignoreDuplicates: true },
+  );
+
+  return await toResponse(search, list);
 }
 
 export async function getHistory(): Promise<HistoryEntry[]> {
