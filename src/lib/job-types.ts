@@ -10,6 +10,7 @@ export type JobResult = {
   apply_url: string;
   matched_keywords: string[];
   is_new: boolean;
+  intent_score?: number;
 };
 
 export type SearchStats = {
@@ -52,4 +53,46 @@ export function parseKeywords(raw: string): string[] {
     out.push(k);
   }
   return out;
+}
+
+export type CrmData = {
+  date_contacted: string | null;
+  response: string | null;
+  meeting: boolean;
+  meeting_date: string | null;
+  opportunity: boolean;
+  opportunity_notes: string | null;
+  revenue: number | null;
+};
+
+export type JobDetail = {
+  job_id: string;
+  company: string;
+  website: string;
+  industry: string;
+  job_title: string;
+  job_description: string;
+  date_posted: string;
+  source: string;
+  similar_jobs_count: number;
+  is_reposted: boolean;
+  signal_category: string;
+  ae_service: string;
+  intent_score: number;
+  reason_for_score: string;
+  outreach_angle: string;
+  decision_maker: string;
+  contact: string;
+  crm: CrmData;
+};
+
+export const RESPONSE_OPTIONS = [
+  "No Response",
+  "Replied - Interested",
+  "Replied - Not Interested",
+  "Bounced",
+] as const;
+
+export function scoreBand(score: number): "high" | "mid" | "low" {
+  return score >= 70 ? "high" : score >= 45 ? "mid" : "low";
 }
