@@ -1,6 +1,7 @@
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { buildStats, generateJobs } from "./job-sample.server";
-import type { HistoryEntry, JobResult, SearchResponse } from "./job-types";
+import { enrichJob } from "./job-enrich.server";
+import type { CrmData, HistoryEntry, JobDetail, JobResult, SearchResponse } from "./job-types";
 
 type JobRow = {
   job_id: string;
@@ -16,11 +17,20 @@ type JobRow = {
   is_new: boolean;
 };
 
-function toResponse(
+async function scoresFor(ids: string[]): Promise<Map<string, number>> {
+  const map = new Map<string, number>();
+  if (ids.length === 0) return map;
+  const { data } = await supabaseAdmin.from("job_details").select("job_id, intent_score").in("job_id", ids);
+  for (const r of data ?? []) map.set(r.job_id, r.intent_score);
+  return map;
+}
+
+async function toResponse(
   search: { id: string; keywords: string[]; location: string; created_at: string },
   rows: JobRow[],
-): SearchResponse {
-  const results: JobResult[] = rows.map((r) => ({ ...r }));
+): Promise<SearchResponse> {
+  const scores = await scoresFor(rows.map((r) => r.job_id));
+  const results: JobResult[] = rows.map((r) => ({ ...r, intent_score: scores.get(r.job_id) ?? 0 }));
   return {
     search_id: search.id,
     keywords: search.keywords,
@@ -72,7 +82,17 @@ export async function runSearch(keywords: string[], location: string): Promise<S
     .insert(jobs.map((job) => ({ ...job, search_id: search.id })));
   if (jobsError) throw new Error(jobsError.message);
 
-  return toResponse(search, jobs);
+  const perCompany: Record<string, number> = {};
+  for (const job of jobs) perCompany[job.company] = (perCompany[job.company] ?? 0) + 1;
+  const { error: detailError } = await supabaseAdmin
+    .from("job_details")
+    .upsert(
+      jobs.map((job) => enrichJob(job, perCompany[job.company] ?? 1)),
+      { onConflict: "job_id", ignoreDuplicates: true },
+    );
+  if (detailError) throw new Error(detailError.message);
+
+  return await toResponse(search, jobs);
 }
 
 export async function getSearch(searchId: string): Promise<SearchResponse | null> {
@@ -92,7 +112,7 @@ export async function getSearch(searchId: string): Promise<SearchResponse | null
     .order("days_ago", { ascending: true });
   if (error) throw new Error(error.message);
 
-  return toResponse(search, (rows ?? []) as JobRow[]);
+  return await toResponse(search, (rows ?? []) as JobRow[]);
 }
 
 export async function getHistory(): Promise<HistoryEntry[]> {
@@ -112,3 +132,45 @@ export async function getHistory(): Promise<HistoryEntry[]> {
     new_results_count: s.new_results_count,
   }));
 }
+
+const CRM_COLS = "date_contacted, response, meeting, meeting_date, opportunity, opportunity_notes, revenue";
+type DetailRow = Omit<JobDetail, "crm"> & CrmData;
+
+function toDetail(r: DetailRow): JobDetail {
+  const { date_contacted, response, meeting, meeting_date, opportunity, opportunity_notes, revenue, ...rest } = r;
+  return {
+    job_id: rest.job_id, company: rest.company, website: rest.website, industry: rest.industry,
+    job_title: rest.job_title, job_description: rest.job_description, date_posted: rest.date_posted,
+    source: rest.source, similar_jobs_count: rest.similar_jobs_count, is_reposted: rest.is_reposted,
+    signal_category: rest.signal_category, ae_service: rest.ae_service, intent_score: rest.intent_score,
+    reason_for_score: rest.reason_for_score, outreach_angle: rest.outreach_angle,
+    decision_maker: rest.decision_maker, contact: rest.contact,
+    crm: {
+      date_contacted, response, meeting, meeting_date, opportunity, opportunity_notes,
+      revenue: revenue === null ? null : Number(revenue),
+    },
+  };
+}
+
+export async function getJob(jobId: string): Promise<JobDetail | null> {
+  const { data, error } = await supabaseAdmin.from("job_details").select("*").eq("job_id", jobId).maybeSingle();
+  if (error) throw new Error(error.message);
+  return data ? toDetail(data as unknown as DetailRow) : null;
+}
+
+export async function getJobs(jobIds: string[]): Promise<Map<string, JobDetail>> {
+  const map = new Map<string, JobDetail>();
+  if (jobIds.length === 0) return map;
+  const { data, error } = await supabaseAdmin.from("job_details").select("*").in("job_id", jobIds);
+  if (error) throw new Error(error.message);
+  for (const r of data ?? []) map.set(r.job_id, toDetail(r as unknown as DetailRow));
+  return map;
+}
+
+export async function updateJob(jobId: string, patch: Record<string, unknown>) {
+  const { data, error } = await supabaseAdmin
+    .from("job_details").update(patch as never).eq("job_id", jobId).select("*").maybeSingle();
+  if (error) throw new Error(error.message);
+  return data ? toDetail(data as unknown as DetailRow) : null;
+}
+export { CRM_COLS };
