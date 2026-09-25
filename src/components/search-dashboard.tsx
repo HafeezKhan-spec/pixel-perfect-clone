@@ -32,6 +32,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { useNavigate } from "@tanstack/react-router";
+import { IntentBadge } from "@/components/intent-badge";
 import type { SearchResponse } from "@/lib/job-types";
 
 const CHART_COLORS = [
@@ -83,6 +85,7 @@ const tooltipStyle = {
 };
 
 export function SearchDashboard({ data }: { data: SearchResponse }) {
+  const navigate = useNavigate();
   const [query, setQuery] = useState("");
   const [sort, setSort] = useState<SortKey>("newest");
   const [keywordFilter, setKeywordFilter] = useState("all");
@@ -298,6 +301,7 @@ export function SearchDashboard({ data }: { data: SearchResponse }) {
           <Table>
             <TableHeader>
               <TableRow>
+                <TableHead>Intent</TableHead>
                 <TableHead>Job title</TableHead>
                 <TableHead>Company</TableHead>
                 <TableHead>Matched keyword</TableHead>
@@ -311,13 +315,25 @@ export function SearchDashboard({ data }: { data: SearchResponse }) {
             <TableBody>
               {rows.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={8} className="py-10 text-center text-muted-foreground">
+                  <TableCell colSpan={9} className="py-10 text-center text-muted-foreground">
                     No jobs match these filters.
                   </TableCell>
                 </TableRow>
               ) : (
                 rows.map((job) => (
-                  <TableRow key={job.job_id}>
+                  <TableRow
+                    key={job.job_id}
+                    tabIndex={0}
+                    className="cursor-pointer"
+                    onClick={() => navigate({ to: "/job/$jobId", params: { jobId: job.job_id } })}
+                    onKeyDown={(event) => {
+                      if (event.key === "Enter")
+                        navigate({ to: "/job/$jobId", params: { jobId: job.job_id } });
+                    }}
+                  >
+                    <TableCell>
+                      <IntentBadge score={job.intent_score ?? 0} />
+                    </TableCell>
                     <TableCell className="max-w-[16rem]">
                       <span className="font-medium">{job.job_title}</span>
                       {job.is_new ? (
@@ -350,9 +366,11 @@ export function SearchDashboard({ data }: { data: SearchResponse }) {
                         href={job.apply_url}
                         target="_blank"
                         rel="noreferrer"
-                        className="inline-flex items-center gap-1 text-primary hover:underline"
+                        aria-label={`Apply for ${job.job_title} (opens in new tab)`}
+                        onClick={(event) => event.stopPropagation()}
+                        className="inline-flex h-7 w-7 items-center justify-center rounded-md text-primary hover:bg-primary/10"
                       >
-                        Open <ArrowUpRight className="h-3.5 w-3.5" />
+                        <ArrowUpRight className="h-4 w-4" />
                       </a>
                     </TableCell>
                   </TableRow>

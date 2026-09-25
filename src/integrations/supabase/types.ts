@@ -14,6 +14,93 @@ export type Database = {
   }
   public: {
     Tables: {
+      job_details: {
+        Row: {
+          ae_service: string
+          company: string
+          contact: string
+          created_at: string
+          date_contacted: string | null
+          date_posted: string
+          decision_maker: string
+          industry: string
+          intent_score: number
+          is_reposted: boolean
+          job_description: string
+          job_id: string
+          job_title: string
+          meeting: boolean
+          meeting_date: string | null
+          opportunity: boolean
+          opportunity_notes: string | null
+          outreach_angle: string
+          reason_for_score: string
+          response: string | null
+          revenue: number | null
+          signal_category: string
+          similar_jobs_count: number
+          source: string
+          updated_at: string
+          website: string
+        }
+        Insert: {
+          ae_service?: string
+          company: string
+          contact?: string
+          created_at?: string
+          date_contacted?: string | null
+          date_posted: string
+          decision_maker?: string
+          industry?: string
+          intent_score?: number
+          is_reposted?: boolean
+          job_description?: string
+          job_id: string
+          job_title: string
+          meeting?: boolean
+          meeting_date?: string | null
+          opportunity?: boolean
+          opportunity_notes?: string | null
+          outreach_angle?: string
+          reason_for_score?: string
+          response?: string | null
+          revenue?: number | null
+          signal_category?: string
+          similar_jobs_count?: number
+          source?: string
+          updated_at?: string
+          website?: string
+        }
+        Update: {
+          ae_service?: string
+          company?: string
+          contact?: string
+          created_at?: string
+          date_contacted?: string | null
+          date_posted?: string
+          decision_maker?: string
+          industry?: string
+          intent_score?: number
+          is_reposted?: boolean
+          job_description?: string
+          job_id?: string
+          job_title?: string
+          meeting?: boolean
+          meeting_date?: string | null
+          opportunity?: boolean
+          opportunity_notes?: string | null
+          outreach_angle?: string
+          reason_for_score?: string
+          response?: string | null
+          revenue?: number | null
+          signal_category?: string
+          similar_jobs_count?: number
+          source?: string
+          updated_at?: string
+          website?: string
+        }
+        Relationships: []
+      }
       search_jobs: {
         Row: {
           apply_url: string

@@ -14,8 +14,12 @@ import { Route as HistoryRouteImport } from './routes/history'
 import { Route as ApiExportRouteImport } from './routes/api/export'
 import { Route as ApiHistoryRouteImport } from './routes/api/history'
 import { Route as ApiSearchRouteImport } from './routes/api/search'
+import { Route as JobJobIdRouteImport } from './routes/job.$jobId'
 import { Route as SearchSearchIdRouteImport } from './routes/search.$searchId'
+import { Route as ApiJobJobIdRouteImport } from './routes/api/job/$jobId'
 import { Route as ApiSearchSearchIdRouteImport } from './routes/api/search.$searchId'
+import { Route as ApiJobJobIdCrmRouteImport } from './routes/api/job/$jobId.crm'
+import { Route as ApiJobJobIdScoreRouteImport } from './routes/api/job/$jobId.score'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -42,15 +46,35 @@ const ApiSearchRoute = ApiSearchRouteImport.update({
   path: '/api/search',
   getParentRoute: () => rootRouteImport,
 } as any)
+const JobJobIdRoute = JobJobIdRouteImport.update({
+  id: '/job/$jobId',
+  path: '/job/$jobId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SearchSearchIdRoute = SearchSearchIdRouteImport.update({
   id: '/search/$searchId',
   path: '/search/$searchId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiJobJobIdRoute = ApiJobJobIdRouteImport.update({
+  id: '/api/job/$jobId',
+  path: '/api/job/$jobId',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiSearchSearchIdRoute = ApiSearchSearchIdRouteImport.update({
   id: '/$searchId',
   path: '/$searchId',
   getParentRoute: () => ApiSearchRoute,
+} as any)
+const ApiJobJobIdCrmRoute = ApiJobJobIdCrmRouteImport.update({
+  id: '/crm',
+  path: '/crm',
+  getParentRoute: () => ApiJobJobIdRoute,
+} as any)
+const ApiJobJobIdScoreRoute = ApiJobJobIdScoreRouteImport.update({
+  id: '/score',
+  path: '/score',
+  getParentRoute: () => ApiJobJobIdRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
@@ -59,8 +83,12 @@ export interface FileRoutesByFullPath {
   '/api/export': typeof ApiExportRoute
   '/api/history': typeof ApiHistoryRoute
   '/api/search': typeof ApiSearchRouteWithChildren
+  '/job/$jobId': typeof JobJobIdRoute
   '/search/$searchId': typeof SearchSearchIdRoute
+  '/api/job/$jobId': typeof ApiJobJobIdRouteWithChildren
   '/api/search/$searchId': typeof ApiSearchSearchIdRoute
+  '/api/job/$jobId/crm': typeof ApiJobJobIdCrmRoute
+  '/api/job/$jobId/score': typeof ApiJobJobIdScoreRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -68,8 +96,12 @@ export interface FileRoutesByTo {
   '/api/export': typeof ApiExportRoute
   '/api/history': typeof ApiHistoryRoute
   '/api/search': typeof ApiSearchRouteWithChildren
+  '/job/$jobId': typeof JobJobIdRoute
   '/search/$searchId': typeof SearchSearchIdRoute
+  '/api/job/$jobId': typeof ApiJobJobIdRouteWithChildren
   '/api/search/$searchId': typeof ApiSearchSearchIdRoute
+  '/api/job/$jobId/crm': typeof ApiJobJobIdCrmRoute
+  '/api/job/$jobId/score': typeof ApiJobJobIdScoreRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -78,8 +110,12 @@ export interface FileRoutesById {
   '/api/export': typeof ApiExportRoute
   '/api/history': typeof ApiHistoryRoute
   '/api/search': typeof ApiSearchRouteWithChildren
+  '/job/$jobId': typeof JobJobIdRoute
   '/search/$searchId': typeof SearchSearchIdRoute
+  '/api/job/$jobId': typeof ApiJobJobIdRouteWithChildren
   '/api/search/$searchId': typeof ApiSearchSearchIdRoute
+  '/api/job/$jobId/crm': typeof ApiJobJobIdCrmRoute
+  '/api/job/$jobId/score': typeof ApiJobJobIdScoreRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -89,8 +125,12 @@ export interface FileRouteTypes {
     | '/api/export'
     | '/api/history'
     | '/api/search'
+    | '/job/$jobId'
     | '/search/$searchId'
+    | '/api/job/$jobId'
     | '/api/search/$searchId'
+    | '/api/job/$jobId/crm'
+    | '/api/job/$jobId/score'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -98,8 +138,12 @@ export interface FileRouteTypes {
     | '/api/export'
     | '/api/history'
     | '/api/search'
+    | '/job/$jobId'
     | '/search/$searchId'
+    | '/api/job/$jobId'
     | '/api/search/$searchId'
+    | '/api/job/$jobId/crm'
+    | '/api/job/$jobId/score'
   id:
     | '__root__'
     | '/'
@@ -107,8 +151,12 @@ export interface FileRouteTypes {
     | '/api/export'
     | '/api/history'
     | '/api/search'
+    | '/job/$jobId'
     | '/search/$searchId'
+    | '/api/job/$jobId'
     | '/api/search/$searchId'
+    | '/api/job/$jobId/crm'
+    | '/api/job/$jobId/score'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -117,7 +165,9 @@ export interface RootRouteChildren {
   ApiExportRoute: typeof ApiExportRoute
   ApiHistoryRoute: typeof ApiHistoryRoute
   ApiSearchRoute: typeof ApiSearchRouteWithChildren
+  JobJobIdRoute: typeof JobJobIdRoute
   SearchSearchIdRoute: typeof SearchSearchIdRoute
+  ApiJobJobIdRoute: typeof ApiJobJobIdRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
@@ -157,11 +207,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiSearchRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/job/$jobId': {
+      id: '/job/$jobId'
+      path: '/job/$jobId'
+      fullPath: '/job/$jobId'
+      preLoaderRoute: typeof JobJobIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/search/$searchId': {
       id: '/search/$searchId'
       path: '/search/$searchId'
       fullPath: '/search/$searchId'
       preLoaderRoute: typeof SearchSearchIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/job/$jobId': {
+      id: '/api/job/$jobId'
+      path: '/api/job/$jobId'
+      fullPath: '/api/job/$jobId'
+      preLoaderRoute: typeof ApiJobJobIdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/search/$searchId': {
@@ -170,6 +234,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/api/search/$searchId'
       preLoaderRoute: typeof ApiSearchSearchIdRouteImport
       parentRoute: typeof ApiSearchRoute
+    }
+    '/api/job/$jobId/crm': {
+      id: '/api/job/$jobId/crm'
+      path: '/crm'
+      fullPath: '/api/job/$jobId/crm'
+      preLoaderRoute: typeof ApiJobJobIdCrmRouteImport
+      parentRoute: typeof ApiJobJobIdRoute
+    }
+    '/api/job/$jobId/score': {
+      id: '/api/job/$jobId/score'
+      path: '/score'
+      fullPath: '/api/job/$jobId/score'
+      preLoaderRoute: typeof ApiJobJobIdScoreRouteImport
+      parentRoute: typeof ApiJobJobIdRoute
     }
   }
 }
@@ -186,13 +264,29 @@ const ApiSearchRouteWithChildren = ApiSearchRoute._addFileChildren(
   ApiSearchRouteChildren,
 )
 
+interface ApiJobJobIdRouteChildren {
+  ApiJobJobIdCrmRoute: typeof ApiJobJobIdCrmRoute
+  ApiJobJobIdScoreRoute: typeof ApiJobJobIdScoreRoute
+}
+
+const ApiJobJobIdRouteChildren: ApiJobJobIdRouteChildren = {
+  ApiJobJobIdCrmRoute: ApiJobJobIdCrmRoute,
+  ApiJobJobIdScoreRoute: ApiJobJobIdScoreRoute,
+}
+
+const ApiJobJobIdRouteWithChildren = ApiJobJobIdRoute._addFileChildren(
+  ApiJobJobIdRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   HistoryRoute: HistoryRoute,
   ApiExportRoute: ApiExportRoute,
   ApiHistoryRoute: ApiHistoryRoute,
   ApiSearchRoute: ApiSearchRouteWithChildren,
+  JobJobIdRoute: JobJobIdRoute,
   SearchSearchIdRoute: SearchSearchIdRoute,
+  ApiJobJobIdRoute: ApiJobJobIdRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
