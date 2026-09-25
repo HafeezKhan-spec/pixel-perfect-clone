@@ -79,7 +79,7 @@ export async function runSearch(keywords: string[], location: string): Promise<S
 
   const { error: jobsError } = await supabaseAdmin
     .from("search_jobs")
-    .insert(jobs.map((job) => ({ ...job, search_id: search.id })));
+    .insert(jobs.map(({ intent_score: _s, ...job }) => ({ ...job, search_id: search.id })));
   if (jobsError) throw new Error(jobsError.message);
 
   const perCompany: Record<string, number> = {};
